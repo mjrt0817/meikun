@@ -1,0 +1,42 @@
+{
+  "entities": {
+    "User": {
+      "title": "User Progress",
+      "description": "Stores user progress, unlocked cards, coins, etc.",
+      "type": "object",
+      "properties": {
+        "answeredQuestions": { "type": "object" },
+        "reviewList": { "type": "array" },
+        "mockExamScores": { "type": "array" },
+        "coins": { "type": "integer" },
+        "unlockedCards": { "type": "array" },
+        "gachaRates": { "type": "object" }
+      }
+    },
+    "Card": {
+      "title": "Card",
+      "description": "A collectible card with custom name, rarity, description, color, and optional image url.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "rarity": { "type": "string" },
+        "description": { "type": "string" },
+        "color": { "type": "string" },
+        "icon": { "type": "string" },
+        "imageUrl": { "type": "string" }
+      },
+      "required": ["id", "name", "rarity", "description", "color", "icon"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "User progress storage."
+    },
+    "/cards/{cardId}": {
+      "schema": "Card",
+      "description": "Collectible cards defined by admin."
+    }
+  }
+}

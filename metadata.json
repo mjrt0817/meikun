@@ -1,0 +1,6 @@
+{
+  "name": "新潟明訓中学 受験対策アプリ",
+  "description": "小学5年生向けの新潟明訓中学受験（国語・算数）対策アプリ。過去問傾向に合わせた問題、詳しい解説、復習機能、模擬試験機能を搭載。",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
