@@ -1,10 +1,10 @@
 {
-  "projectId": "gen-lang-client-0125274260",
-  "appId": "1:525064586221:web:a118584b93f9db49669de4",
-  "apiKey": "AIzaSyAfgEV9oDQQPnlP7r-RnAYRKlEB6vL-S5I",
-  "authDomain": "gen-lang-client-0125274260.firebaseapp.com",
-  "firestoreDatabaseId": "ai-studio-db619f79-3aa3-43e2-817a-49ae7e51f647",
-  "storageBucket": "gen-lang-client-0125274260.firebasestorage.app",
-  "messagingSenderId": "525064586221",
+  "projectId": "meikun",
+  "appId": "1:90548988714:web:e4681faac4f8e006ed8c53",
+  "apiKey": "AIzaSyA8Wcl7nLnbkWEfYEsv4H2Koa81BdG_41I",
+  "authDomain": "meikun.firebaseapp.com",
+  "firestoreDatabaseId": "(default)",
+  "storageBucket": "meikun.firebasestorage.app",
+  "messagingSenderId": "90548988714",
   "measurementId": ""
 }
