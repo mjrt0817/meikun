@@ -134,7 +134,17 @@ export default function GachaScreen({ progress, onUpdateProgress, onBack, cardsL
 
               {/* Back of Card (shows Mystery Back when unrevealed, otherwise card's explanation back) */}
               {isRevealed ? (
-                <CardBackPattern card={result} />
+                <div
+                  className="absolute inset-0 rounded-2xl shadow-xl overflow-hidden"
+                  style={{
+                    backfaceVisibility: 'hidden',
+                    WebkitBackfaceVisibility: 'hidden',
+                    transform: 'rotateY(0deg)',
+                    WebkitTransform: 'rotateY(0deg)',
+                  }}
+                >
+                  <CardBackPattern card={result} />
+                </div>
               ) : (
                 <div
                   className="absolute inset-0 bg-gradient-to-br from-slate-900 via-indigo-950 to-purple-900 rounded-2xl shadow-xl border-4 border-yellow-500/60 p-4 flex flex-col items-center justify-between text-white"
