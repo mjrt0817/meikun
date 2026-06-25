@@ -10,6 +10,7 @@ import LoginScreen from './components/LoginScreen';
 import GachaScreen from './components/GachaScreen';
 import AlbumScreen from './components/AlbumScreen';
 import CardBackPattern from './components/CardBackPattern';
+import { compressImage } from './utils/imageCompressor';
 import { DEFAULT_GACHA_RATES, Rarity, Card, initialCards } from './cards';
 import { BookOpen, Calculator, PlayCircle, RefreshCw, Award, Home, Brain, Target, ChevronRight, LogOut, Loader2, Sparkles, Image, Coins, Plus, Trash2 } from 'lucide-react';
 import { auth, subscribeToAuth, loadProgress as loadFirebaseProgress, saveProgress as saveFirebaseProgress, logout, loadCards, saveCard, removeCard } from './lib/firebase';
@@ -103,7 +104,8 @@ export default function App() {
       alert('新しいカードを追加しました！');
     } catch (err) {
       console.error(err);
-      alert('カードの追加に失敗しました。');
+      const errMsg = err instanceof Error ? err.message : String(err);
+      alert(`カードの追加に失敗しました。\nエラー詳細: ${errMsg}`);
     }
   };
 
@@ -658,8 +660,15 @@ export default function App() {
                                         return;
                                       }
                                       const reader = new FileReader();
-                                      reader.onloadend = () => {
-                                        setNewCardImageUrl(reader.result as string);
+                                      reader.onloadend = async () => {
+                                        const base64Str = reader.result as string;
+                                        try {
+                                          const compressed = await compressImage(base64Str);
+                                          setNewCardImageUrl(compressed);
+                                        } catch (compressError) {
+                                          console.error('Image compression failed:', compressError);
+                                          setNewCardImageUrl(base64Str);
+                                        }
                                       };
                                       reader.readAsDataURL(file);
                                     }
