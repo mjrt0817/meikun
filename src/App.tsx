@@ -752,12 +752,12 @@ export default function App() {
 
                         {/* プレビューカード本体 */}
                         <div 
-                          className="relative w-56 h-72 cursor-pointer transition-transform duration-300 hover:scale-[1.03]"
+                          className="relative w-56 aspect-[1/1.397] cursor-pointer transition-all duration-300 hover:scale-[1.03] hover:shadow-2xl rounded-2xl"
                           style={{ perspective: '1000px' }}
                           onClick={() => setPreviewFlipped(prev => !prev)}
                         >
                           <div
-                            className="w-full h-full relative transition-transform duration-500"
+                            className="w-full h-full relative transition-transform duration-500 ease-in-out"
                             style={{
                               transformStyle: 'preserve-3d',
                               WebkitTransformStyle: 'preserve-3d',

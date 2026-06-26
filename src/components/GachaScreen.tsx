@@ -66,7 +66,7 @@ export default function GachaScreen({ progress, onUpdateProgress, onBack, cardsL
       <h2 className="text-2xl font-bold text-gray-800 mb-2">カードガチャ</h2>
       <p className="text-sm text-gray-500 mb-8">1回 {GACHA_COST} コインで引けるよ！</p>
 
-      <div className="relative w-64 h-80 mb-6" style={{ perspective: '1000px', WebkitPerspective: '1000px' }}>
+      <div className="relative w-64 aspect-[1/1.397] mb-6" style={{ perspective: '1000px', WebkitPerspective: '1000px' }}>
         {isDrawing ? (
           <div className="absolute inset-0 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-2xl shadow-xl flex items-center justify-center animate-pulse">
             <RefreshCw className="w-12 h-12 text-white animate-spin" />

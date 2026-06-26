@@ -34,7 +34,7 @@ export default function AlbumScreen({ progress, onBack, cardsList }: Props) {
           
           if (!isUnlocked) {
             return (
-              <div key={card.id} className="aspect-[3/4] bg-gray-100 rounded-xl border-2 border-dashed border-gray-300 flex flex-col items-center justify-center p-4 relative group">
+              <div key={card.id} className="aspect-[1/1.397] bg-gray-100 rounded-xl border-2 border-dashed border-gray-300 flex flex-col items-center justify-center p-4 relative group">
                 <Lock className="w-8 h-8 text-gray-300 mb-2" />
                 <div className="text-6xl filter grayscale opacity-20">{card.icon}</div>
                 <div className="absolute top-2 left-2 bg-gray-200 text-gray-400 text-xs font-bold px-1.5 py-0.5 rounded">
@@ -52,7 +52,7 @@ export default function AlbumScreen({ progress, onBack, cardsList }: Props) {
                   prev.includes(card.id) ? prev.filter(id => id !== card.id) : [...prev, card.id]
                 );
               }}
-              className="aspect-[3/4] relative cursor-pointer group animate-none"
+              className="aspect-[1/1.397] relative cursor-pointer group animate-none"
               style={{ perspective: '1000px' }}
             >
               <div
