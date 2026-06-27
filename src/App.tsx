@@ -12,7 +12,7 @@ import AlbumScreen from './components/AlbumScreen';
 import CardBackPattern from './components/CardBackPattern';
 import { compressImage } from './utils/imageCompressor';
 import { DEFAULT_GACHA_RATES, Rarity, Card, initialCards } from './cards';
-import { BookOpen, Calculator, PlayCircle, RefreshCw, Award, Home, Brain, Target, ChevronRight, LogOut, Loader2, Sparkles, Image, Coins, Plus, Trash2 } from 'lucide-react';
+import { BookOpen, Calculator, PlayCircle, RefreshCw, Award, Home, Brain, Target, ChevronRight, LogOut, Loader2, Sparkles, Image, Coins, Plus, Trash2, Edit } from 'lucide-react';
 import { auth, subscribeToAuth, loadProgress as loadFirebaseProgress, saveProgress as saveFirebaseProgress, logout, loadCards, saveCard, removeCard } from './lib/firebase';
 import CsvQuestionManager from './components/CsvQuestionManager';
 import { getActiveReviewQuestions, getRetentionStats } from './utils/ebbinghaus';
@@ -55,11 +55,27 @@ export default function App() {
   const [newCardBackPattern, setNewCardBackPattern] = useState('minimalist');
   const [imageSource, setImageSource] = useState<'upload' | 'preset'>('preset');
   const [previewFlipped, setPreviewFlipped] = useState(false);
+  const [editingCardId, setEditingCardId] = useState<string | null>(null);
+
+  const handleResetCardForm = () => {
+    setNewCardId('');
+    setNewCardName('');
+    setNewCardDescription('');
+    setNewCardColor('from-blue-200 to-blue-300');
+    setNewCardIcon('🃏');
+    setNewCardImageUrl('');
+    setNewCardBackTitle('');
+    setNewCardBackSubtitle('');
+    setNewCardBackExplanation('');
+    setNewCardBackPattern('minimalist');
+    setImageSource('preset');
+    setEditingCardId(null);
+  };
 
   const handleAddCardSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!currentUser) {
-      alert('カードを登録するには、Googleアカウントでログインする必要があります（ゲストモードでは保存できません）。');
+      alert('カードを登録/更新するには、Googleアカウントでログインする必要があります（ゲストモードでは保存できません）。');
       return;
     }
     if (!newCardName.trim()) {
@@ -69,7 +85,7 @@ export default function App() {
     
     const cardId = newCardId.trim() || `custom_${Date.now()}`;
     
-    if (cardsList.some(c => c.id === cardId)) {
+    if (!editingCardId && cardsList.some(c => c.id === cardId)) {
       alert('そのカードIDはすでに存在します。');
       return;
     }
@@ -79,7 +95,7 @@ export default function App() {
     const finalBackSubtitle = newCardBackSubtitle.trim() || `${newCardRarity} Rank Card`;
 
     const newCard: Card = {
-      id: cardId,
+      id: editingCardId || cardId,
       name: newCardName.trim(),
       rarity: newCardRarity,
       description: finalBackExplanation, // fallback
@@ -97,22 +113,39 @@ export default function App() {
       const updatedList = await loadCards();
       setCardsList(updatedList);
       
-      setNewCardId('');
-      setNewCardName('');
-      setNewCardDescription('');
-      setNewCardColor('from-blue-200 to-blue-300');
-      setNewCardIcon('🃏');
-      setNewCardImageUrl('');
-      setNewCardBackTitle('');
-      setNewCardBackSubtitle('');
-      setNewCardBackExplanation('');
-      setNewCardBackPattern('minimalist');
-      setImageSource('preset');
-      alert('新しいカードを追加しました！');
+      const wasEditing = !!editingCardId;
+      handleResetCardForm();
+      alert(wasEditing ? 'カード情報を更新しました！' : '新しいカードを追加しました！');
     } catch (err) {
       console.error(err);
       const errMsg = err instanceof Error ? err.message : String(err);
-      alert(`カードの追加に失敗しました。\nエラー詳細: ${errMsg}`);
+      alert(`カードの保存に失敗しました。\nエラー詳細: ${errMsg}`);
+    }
+  };
+
+  const handleEditCardClick = (card: Card) => {
+    setEditingCardId(card.id);
+    setNewCardId(card.id);
+    setNewCardName(card.name);
+    setNewCardRarity(card.rarity);
+    setNewCardDescription(card.description || '');
+    setNewCardColor(card.color || 'from-blue-200 to-blue-300');
+    setNewCardIcon(card.icon || '🃏');
+    setNewCardImageUrl(card.imageUrl || '');
+    setNewCardBackTitle(card.backTitle || '');
+    setNewCardBackSubtitle(card.backSubtitle || '');
+    setNewCardBackExplanation(card.backExplanation || card.description || '');
+    setNewCardBackPattern(card.backPattern || 'minimalist');
+    
+    if (card.imageUrl) {
+      setImageSource(card.imageUrl.startsWith('/src/assets/images') ? 'preset' : 'upload');
+    } else {
+      setImageSource('preset');
+    }
+    
+    const formEl = document.getElementById('card-design-form');
+    if (formEl) {
+      formEl.scrollIntoView({ behavior: 'smooth' });
     }
   };
 
@@ -560,11 +593,20 @@ export default function App() {
                   カード管理（追加・削除）
                 </h4>
 
-                {/* 新規追加フォーム (表面・裏面の見直し) */}
-                <form onSubmit={handleAddCardSubmit} className="mb-8 p-6 bg-slate-50 rounded-2xl border border-slate-100">
+                {/* 新規追加・編集フォーム (表面・裏面の見直し) */}
+                <form id="card-design-form" onSubmit={handleAddCardSubmit} className="mb-8 p-6 bg-slate-50 rounded-2xl border border-slate-100">
                   <h5 className="text-base font-extrabold text-slate-800 flex items-center mb-4 border-b border-slate-200 pb-2">
-                    <Plus className="w-5 h-5 mr-1 text-green-500" />
-                    新規カードの登録・デザイン
+                    {editingCardId ? (
+                      <>
+                        <Sparkles className="w-5 h-5 mr-1 text-indigo-500 animate-pulse" />
+                        カードデータの編集・デザイン（ID: {editingCardId}）
+                      </>
+                    ) : (
+                      <>
+                        <Plus className="w-5 h-5 mr-1 text-green-500" />
+                        新規カードの登録・デザイン
+                      </>
+                    )}
                   </h5>
 
                   <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
@@ -576,13 +618,18 @@ export default function App() {
                         <h6 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-3">基本情報</h6>
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                           <div>
-                            <label className="block text-xs font-bold text-gray-500 mb-1">カードID (自動生成は空欄)</label>
+                            <label className="block text-xs font-bold text-gray-500 mb-1">
+                              {editingCardId ? 'カードID（編集不可）' : 'カードID (自動生成は空欄)'}
+                            </label>
                             <input
                               type="text"
                               placeholder="例: custom_yakumo"
                               value={newCardId}
                               onChange={(e) => setNewCardId(e.target.value)}
-                              className="border border-gray-300 focus:border-indigo-400 focus:ring-1 focus:ring-indigo-400 rounded-lg p-2 text-xs w-full font-semibold"
+                              disabled={editingCardId !== null}
+                              className={`border border-gray-300 focus:border-indigo-400 focus:ring-1 focus:ring-indigo-400 rounded-lg p-2 text-xs w-full font-semibold ${
+                                editingCardId ? 'bg-gray-100 text-gray-400 cursor-not-allowed border-gray-200' : ''
+                              }`}
                             />
                           </div>
                           <div>
@@ -780,12 +827,23 @@ export default function App() {
                         </div>
                       </div>
 
-                      <button
-                        type="submit"
-                        className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold py-3 px-4 rounded-xl shadow-md hover:shadow-lg transition-all text-sm cursor-pointer hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98]"
-                      >
-                        このカードをデータベースに登録する！
-                      </button>
+                      <div className="flex flex-col sm:flex-row gap-3">
+                        <button
+                          type="submit"
+                          className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold py-3 px-4 rounded-xl shadow-md hover:shadow-lg transition-all text-sm cursor-pointer hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98]"
+                        >
+                          {editingCardId ? 'カード情報を更新（保存）する！' : 'このカードをデータベースに登録する！'}
+                        </button>
+                        {editingCardId && (
+                          <button
+                            type="button"
+                            onClick={handleResetCardForm}
+                            className="bg-slate-200 hover:bg-slate-300 text-slate-700 font-extrabold py-3 px-4 rounded-xl transition-all text-sm cursor-pointer hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98]"
+                          >
+                            キャンセル
+                          </button>
+                        )}
+                      </div>
 
                     </div>
 
@@ -918,13 +976,22 @@ export default function App() {
                           <p className="text-xs text-gray-400 font-medium truncate max-w-xs sm:max-w-md">{card.description}</p>
                         </div>
                       </div>
-                      <button
-                        onClick={() => handleDeleteCard(card.id)}
-                        className="text-gray-400 hover:text-red-500 p-2 rounded-lg hover:bg-red-50 transition-colors cursor-pointer"
-                        title="このカードを削除"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
+                      <div className="flex items-center space-x-1">
+                        <button
+                          onClick={() => handleEditCardClick(card)}
+                          className="text-gray-400 hover:text-indigo-600 p-2 rounded-lg hover:bg-indigo-50 transition-colors cursor-pointer"
+                          title="このカードを編集"
+                        >
+                          <Edit className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => handleDeleteCard(card.id)}
+                          className="text-gray-400 hover:text-red-500 p-2 rounded-lg hover:bg-red-50 transition-colors cursor-pointer"
+                          title="このカードを削除"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
                     </div>
                   ))}
                 </div>
