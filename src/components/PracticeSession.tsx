@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Question, Subject, UserProgress } from '../types';
 import { CheckCircle2, XCircle, ArrowRight, HelpCircle } from 'lucide-react';
 import VideoLinkBadge from './VideoLinkBadge';
+import { updateReviewSchedule } from '../utils/ebbinghaus';
 
 interface Props {
   questions: Question[];
@@ -36,6 +37,9 @@ export default function PracticeSession({ questions, subject, progress, onUpdate
     // Update progress
     const newProgress = { ...progress };
     newProgress.answeredQuestions = { ...newProgress.answeredQuestions, [currentQ.id]: isCurrentlyCorrect };
+    
+    // Update Ebbinghaus schedule
+    newProgress.reviewSchedules = updateReviewSchedule(currentQ.id, isCurrentlyCorrect, newProgress.reviewSchedules);
     
     if (isCurrentlyCorrect) {
       const coinsToEarn = showHint ? 5 : 10;

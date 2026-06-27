@@ -83,7 +83,7 @@ export const subscribeToAuth = (callback: (user: User | null) => void) => {
   return onAuthStateChanged(auth, callback);
 };
 
-const DEFAULT_PROGRESS: UserProgress = { answeredQuestions: {}, reviewList: [], mockExamScores: [], coins: 0, unlockedCards: [] };
+const DEFAULT_PROGRESS: UserProgress = { answeredQuestions: {}, reviewList: [], mockExamScores: [], coins: 0, unlockedCards: [], customQuestions: [], reviewSchedules: {} };
 
 export const loadProgress = async (userId: string): Promise<UserProgress> => {
   try {
@@ -97,7 +97,9 @@ export const loadProgress = async (userId: string): Promise<UserProgress> => {
         mockExamScores: data.mockExamScores || [],
         coins: data.coins || 0,
         unlockedCards: data.unlockedCards || [],
-        gachaRates: data.gachaRates
+        gachaRates: data.gachaRates,
+        customQuestions: data.customQuestions || [],
+        reviewSchedules: data.reviewSchedules || {}
       };
     } else {
       // Initialize if missing

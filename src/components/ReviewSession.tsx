@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Question, UserProgress } from '../types';
 import { CheckCircle2, XCircle, ArrowRight, HelpCircle, Trophy } from 'lucide-react';
 import VideoLinkBadge from './VideoLinkBadge';
+import { getActiveReviewQuestions, updateReviewSchedule } from '../utils/ebbinghaus';
 
 interface Props {
   questions: Question[];
@@ -11,7 +12,7 @@ interface Props {
 }
 
 export default function ReviewSession({ questions, progress, onUpdateProgress, onFinish }: Props) {
-  const reviewQuestions = questions.filter(q => progress.reviewList.includes(q.id));
+  const reviewQuestions = getActiveReviewQuestions(questions, progress);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
   const [isAnswered, setIsAnswered] = useState(false);
@@ -64,13 +65,21 @@ export default function ReviewSession({ questions, progress, onUpdateProgress, o
     const newProgress = { ...progress };
     newProgress.answeredQuestions = { ...newProgress.answeredQuestions, [currentQ.id]: isCurrentlyCorrect };
     
+    // Update Ebbinghaus schedule
+    newProgress.reviewSchedules = updateReviewSchedule(currentQ.id, isCurrentlyCorrect, newProgress.reviewSchedules);
+    
     if (isCurrentlyCorrect) {
-      // Remove from review list if correct
+      // Remove from legacy list if correct
       newProgress.reviewList = newProgress.reviewList.filter(id => id !== currentQ.id);
       
       const coinsToEarn = showHint ? 15 : 30; // Revenge correct bonus
       newProgress.coins = (newProgress.coins || 0) + coinsToEarn;
       setEarnedCoins(coinsToEarn);
+    } else {
+      // Add to legacy list for fallback
+      if (!newProgress.reviewList.includes(currentQ.id)) {
+        newProgress.reviewList = [...newProgress.reviewList, currentQ.id];
+      }
     }
     
     onUpdateProgress(newProgress);

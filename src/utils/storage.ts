@@ -13,13 +13,15 @@ export const loadProgress = (): UserProgress => {
         mockExamScores: parsed.mockExamScores || [],
         coins: parsed.coins || 0,
         unlockedCards: parsed.unlockedCards || [],
-        gachaRates: parsed.gachaRates
+        gachaRates: parsed.gachaRates,
+        customQuestions: parsed.customQuestions || [],
+        reviewSchedules: parsed.reviewSchedules || {}
       };
     } catch (e) {
       console.error("Failed to parse progress from localStorage");
     }
   }
-  return { answeredQuestions: {}, reviewList: [], mockExamScores: [], coins: 0, unlockedCards: [] };
+  return { answeredQuestions: {}, reviewList: [], mockExamScores: [], coins: 0, unlockedCards: [], customQuestions: [], reviewSchedules: {} };
 };
 
 export const saveProgress = (progress: UserProgress) => {

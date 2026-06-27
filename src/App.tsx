@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Subject, ViewState, UserProgress } from './types';
+import { Subject, ViewState, UserProgress, Question } from './types';
 import { questions } from './data';
 import { loadProgress as loadLocalProgress, saveProgress as saveLocalProgress } from './utils/storage';
 import type { User } from 'firebase/auth';
@@ -14,6 +14,8 @@ import { compressImage } from './utils/imageCompressor';
 import { DEFAULT_GACHA_RATES, Rarity, Card, initialCards } from './cards';
 import { BookOpen, Calculator, PlayCircle, RefreshCw, Award, Home, Brain, Target, ChevronRight, LogOut, Loader2, Sparkles, Image, Coins, Plus, Trash2 } from 'lucide-react';
 import { auth, subscribeToAuth, loadProgress as loadFirebaseProgress, saveProgress as saveFirebaseProgress, logout, loadCards, saveCard, removeCard } from './lib/firebase';
+import CsvQuestionManager from './components/CsvQuestionManager';
+import { getActiveReviewQuestions, getRetentionStats } from './utils/ebbinghaus';
 
 export default function App() {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
@@ -31,6 +33,11 @@ export default function App() {
   const [showSettings, setShowSettings] = useState(false);
   const [passwordInput, setPasswordInput] = useState('');
   const [cardsList, setCardsList] = useState<Card[]>(initialCards);
+  const [allQuestions, setAllQuestions] = useState<Question[]>([]);
+
+  useEffect(() => {
+    setAllQuestions([...questions, ...(progress.customQuestions || [])]);
+  }, [progress.customQuestions]);
 
   // Custom Card Form States
   const [newCardId, setNewCardId] = useState('');
@@ -201,8 +208,9 @@ export default function App() {
   }
 
   const renderHome = () => {
-    const mathCount = questions.filter(q => q.subject === 'math').length;
-    const jaCount = questions.filter(q => q.subject === 'japanese').length;
+    const mathCount = allQuestions.filter(q => q.subject === 'math').length;
+    const jaCount = allQuestions.filter(q => q.subject === 'japanese').length;
+    const stats = getRetentionStats(allQuestions, progress);
     
     // Recent mock exam score
     const recentScores = [...progress.mockExamScores].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
@@ -338,24 +346,59 @@ export default function App() {
 
         {/* Dynamic lower section: Review / Status */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="bg-purple-50 rounded-3xl p-6 sm:p-8 border border-purple-100">
-            <h3 className="text-xl font-bold text-purple-900 mb-2 flex items-center">
-              <RefreshCw className="w-6 h-6 mr-2" />
-              復習リスト
-            </h3>
-            <p className="text-purple-700 mb-6 font-medium text-sm">
-              まちがえた問題が自動でここに入ります。完璧になるまで何度もチャレンジしよう！
-            </p>
-            {progress.reviewList.length > 0 ? (
+          <div className="bg-gradient-to-br from-purple-50 to-indigo-50 rounded-3xl p-6 sm:p-8 border border-purple-100 flex flex-col justify-between">
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="text-xl font-extrabold text-purple-900 flex items-center">
+                  <Brain className="w-6 h-6 mr-2 text-purple-600" />
+                  忘却曲線トレーニング
+                </h3>
+                <span className="text-[10px] bg-purple-200 text-purple-800 font-black px-2 py-0.5 rounded-full uppercase tracking-wider">
+                  Ebbinghaus
+                </span>
+              </div>
+              <p className="text-purple-700 mb-5 font-semibold text-xs leading-relaxed">
+                科学的に実証されたタイミング（1・3・7・14・30日後）に繰り返し復習し、記憶を完全に定着させます。
+              </p>
+
+              {/* Retention Stages Tracker */}
+              <div className="bg-white/70 backdrop-blur-sm border border-purple-200/50 rounded-2xl p-4 mb-5">
+                <h4 className="text-xs font-black text-purple-800 mb-2.5">記憶の定着ステージ分布</h4>
+                <div className="grid grid-cols-5 gap-1.5 text-center">
+                  <div className="bg-purple-100/50 p-1.5 rounded-lg border border-purple-200/30">
+                    <p className="text-[9px] font-bold text-purple-700">1日後</p>
+                    <p className="text-sm font-black text-purple-900">{stats.stage1Count}</p>
+                  </div>
+                  <div className="bg-indigo-100/50 p-1.5 rounded-lg border border-indigo-200/30">
+                    <p className="text-[9px] font-bold text-indigo-700">3日後</p>
+                    <p className="text-sm font-black text-indigo-900">{stats.stage2Count}</p>
+                  </div>
+                  <div className="bg-blue-100/50 p-1.5 rounded-lg border border-blue-200/30">
+                    <p className="text-[9px] font-bold text-blue-700">7日後</p>
+                    <p className="text-sm font-black text-blue-900">{stats.stage3Count}</p>
+                  </div>
+                  <div className="bg-teal-100/50 p-1.5 rounded-lg border border-teal-200/30">
+                    <p className="text-[9px] font-bold text-teal-700">14日後</p>
+                    <p className="text-sm font-black text-teal-900">{stats.stage4Count}</p>
+                  </div>
+                  <div className="bg-amber-100 text-amber-900 p-1.5 rounded-lg border border-amber-200 animate-pulse">
+                    <p className="text-[9px] font-bold text-amber-700">殿堂入り</p>
+                    <p className="text-sm font-black text-amber-900">👑 {stats.stage5Count}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {stats.dueCount > 0 ? (
               <button
                 onClick={() => setViewState('review')}
-                className="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-4 rounded-xl shadow transition-all active:scale-[0.98] flex items-center justify-center text-lg"
+                className="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-4 rounded-2xl shadow-md hover:shadow-lg hover:shadow-purple-200 transition-all active:scale-[0.98] flex items-center justify-center text-lg cursor-pointer"
               >
-                復習スタート（残り {progress.reviewList.length} 問）
+                復習スタート（本日は残り {stats.dueCount} 問）
               </button>
             ) : (
-              <div className="bg-white/60 rounded-xl p-4 text-center text-purple-600 font-bold border border-purple-200 border-dashed">
-                復習する問題は今ゼロ！すごい！🎉
+              <div className="bg-white/60 rounded-xl p-4 text-center text-purple-600 font-bold border border-purple-200 border-dashed text-sm">
+                🎉 本日の復習タスクはすべて完了！記憶は万全です！
               </div>
             )}
           </div>
@@ -506,6 +549,9 @@ export default function App() {
                   ※ 合計が100%にならなくても、入力された比率で自動計算されます。
                 </p>
               </div>
+
+              {/* CSV 問題管理インポート */}
+              <CsvQuestionManager progress={progress} onUpdateProgress={handleUpdateProgress} />
 
               {/* カード管理 (追加・削除) */}
               <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-200 mt-6">
@@ -752,7 +798,7 @@ export default function App() {
 
                         {/* プレビューカード本体 */}
                         <div 
-                          className="relative w-56 aspect-[1/1.397] cursor-pointer transition-all duration-300 hover:scale-[1.03] hover:shadow-2xl rounded-2xl"
+                          className="relative w-72 sm:w-80 aspect-[1/1.397] cursor-pointer transition-all duration-300 hover:scale-[1.03] hover:shadow-2xl rounded-2xl"
                           style={{ perspective: '1000px' }}
                           onClick={() => setPreviewFlipped(prev => !prev)}
                         >
@@ -959,7 +1005,7 @@ export default function App() {
         {viewState === 'practice' && (
           <div className="animate-in slide-in-from-right duration-300">
             <PracticeSession
-              questions={questions}
+              questions={allQuestions}
               subject={selectedSubject}
               progress={progress}
               onUpdateProgress={handleUpdateProgress}
@@ -971,7 +1017,7 @@ export default function App() {
         {viewState === 'review' && (
           <div className="animate-in slide-in-from-bottom duration-300">
             <ReviewSession
-              questions={questions}
+              questions={allQuestions}
               progress={progress}
               onUpdateProgress={handleUpdateProgress}
               onFinish={() => setViewState('home')}
@@ -982,7 +1028,7 @@ export default function App() {
         {viewState === 'mock-exam' && (
           <div className="animate-in zoom-in-95 duration-300">
             <MockExamSession
-              questions={questions}
+              questions={allQuestions}
               subject={selectedSubject}
               progress={progress}
               onUpdateProgress={handleUpdateProgress}

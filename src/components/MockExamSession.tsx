@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Question, Subject, UserProgress } from '../types';
 import { Clock, ArrowRight, CheckCircle2, XCircle } from 'lucide-react';
 import VideoLinkBadge from './VideoLinkBadge';
+import { updateReviewSchedule } from '../utils/ebbinghaus';
 
 interface Props {
   questions: Question[];
@@ -42,6 +43,9 @@ export default function MockExamSession({ questions, subject, progress, onUpdate
       if (isCorrect) correctCount++;
       
       currentProgress.answeredQuestions = { ...currentProgress.answeredQuestions, [q.id]: isCorrect };
+      
+      // Update Ebbinghaus schedule
+      currentProgress.reviewSchedules = updateReviewSchedule(q.id, isCorrect, currentProgress.reviewSchedules);
       
       // まちがえた問題や未回答のものを自動で復習リストに追加
       if (!isCorrect && !currentProgress.reviewList.includes(q.id)) {
