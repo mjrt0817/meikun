@@ -201,6 +201,7 @@ export default function CardBackPattern({ card, className = '' }: Props) {
 function getDefaultPattern(card: Card): string {
   if (card.rarity === 'SEC') return 'cyber';
   if (card.rarity === 'UR') return 'japanese';
+  if (card.rarity === 'SSR') return 'japanese';
   if (card.rarity === 'SR') return 'fantasy';
   if (card.rarity === 'R') return 'academic';
   return 'minimalist';

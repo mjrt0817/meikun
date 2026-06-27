@@ -29,6 +29,14 @@ const getRarityGlowClasses = (rarity: Rarity) => {
         titleColor: 'text-yellow-600 font-extrabold',
         soundText: '✨ 超激レア！！ 黄金のURカード出現！ ✨'
       };
+    case 'SSR':
+      return {
+        outerGlow: 'bg-gradient-to-r from-teal-400 via-emerald-400 to-cyan-500 animate-glow-pulse opacity-90',
+        ringClass: 'ring-3 ring-emerald-400 ring-offset-1 shadow-[0_0_30px_rgba(16,185,129,0.6)] border border-emerald-200',
+        cardSparkles: 'text-emerald-300 animate-pulse',
+        titleColor: 'text-emerald-600 font-extrabold',
+        soundText: '💖 奇跡の一枚！ SSRカード出現！ 💖'
+      };
     case 'SR':
       return {
         outerGlow: 'bg-gradient-to-r from-purple-600 via-pink-500 to-indigo-600 animate-glow-pulse opacity-85',
@@ -125,7 +133,7 @@ export default function GachaScreen({ progress, onUpdateProgress, onBack, cardsL
             {result.rarity !== 'N' && (
               <div className="absolute inset-0 pointer-events-none flex items-center justify-center overflow-visible">
                 <div className="absolute w-[140%] h-[140%] bg-[radial-gradient(circle,rgba(255,255,255,0.15)_0%,rgba(0,0,0,0)_60%)] rounded-full animate-spin-slow" />
-                {(result.rarity === 'UR' || result.rarity === 'SEC') && (
+                {(result.rarity === 'UR' || result.rarity === 'SEC' || result.rarity === 'SSR') && (
                   <div className="absolute w-[125%] h-[125%] bg-[radial-gradient(circle,rgba(253,224,71,0.1)_0%,rgba(0,0,0,0)_65%)] rounded-full animate-spin-reverse" />
                 )}
               </div>
@@ -134,7 +142,7 @@ export default function GachaScreen({ progress, onUpdateProgress, onBack, cardsL
             <div
               onClick={handleCardClick}
               className={`w-full h-full cursor-pointer relative ${
-                isFlipped && (result.rarity === 'UR' || result.rarity === 'SEC') ? 'animate-bounce' : ''
+                isFlipped && (result.rarity === 'UR' || result.rarity === 'SEC' || result.rarity === 'SSR') ? 'animate-bounce' : ''
               }`}
             >
               <div
@@ -171,8 +179,8 @@ export default function GachaScreen({ progress, onUpdateProgress, onBack, cardsL
                         {result.rarity}
                       </div>
                       
-                      {/* Interactive Sparkles Floating for UR and SEC Images */}
-                      {(result.rarity === 'UR' || result.rarity === 'SEC') && (
+                      {/* Interactive Sparkles Floating for SSR, UR and SEC Images */}
+                      {(result.rarity === 'UR' || result.rarity === 'SEC' || result.rarity === 'SSR') && (
                         <div className="absolute inset-0 pointer-events-none">
                           <Sparkles className={`absolute top-4 right-4 w-6 h-6 ${getRarityGlowClasses(result.rarity).cardSparkles}`} />
                           <Sparkles className="absolute bottom-6 left-6 w-4 h-4 text-white/80 animate-ping" />

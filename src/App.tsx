@@ -554,8 +554,8 @@ export default function App() {
                   <Sparkles className="w-5 h-5 mr-2 text-yellow-500" />
                   ガチャの排出率設定 (%)
                 </h4>
-                <div className="grid grid-cols-2 sm:grid-cols-5 gap-4">
-                  {(['N', 'R', 'SR', 'UR', 'SEC'] as Rarity[]).map((r) => (
+                <div className="grid grid-cols-2 sm:grid-cols-6 gap-4">
+                  {(['N', 'R', 'SR', 'SSR', 'UR', 'SEC'] as Rarity[]).map((r) => (
                     <div key={r} className="flex flex-col">
                       <label className="text-xs font-bold text-gray-500 mb-1">{r}</label>
                       <input
@@ -653,6 +653,7 @@ export default function App() {
                               <option value="N">Normal (N)</option>
                               <option value="R">Rare (R)</option>
                               <option value="SR">Super Rare (SR)</option>
+                              <option value="SSR">Specially Super Rare (SSR)</option>
                               <option value="UR">Ultra Rare (UR)</option>
                               <option value="SEC">Secret (SEC)</option>
                             </select>
@@ -967,6 +968,7 @@ export default function App() {
                             <span className={`text-[10px] font-extrabold px-1.5 py-0.5 rounded text-white ${
                               card.rarity === 'SEC' ? 'bg-red-500' :
                               card.rarity === 'UR' ? 'bg-purple-600' :
+                              card.rarity === 'SSR' ? 'bg-emerald-500' :
                               card.rarity === 'SR' ? 'bg-yellow-500 text-gray-900' :
                               card.rarity === 'R' ? 'bg-blue-500' : 'bg-gray-400'
                             }`}>

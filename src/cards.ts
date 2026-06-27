@@ -1,4 +1,4 @@
-export type Rarity = 'N' | 'R' | 'SR' | 'UR' | 'SEC';
+export type Rarity = 'N' | 'R' | 'SR' | 'SSR' | 'UR' | 'SEC';
 
 export interface Card {
   id: string;
@@ -32,6 +32,9 @@ export const initialCards: Card[] = [
   { id: 'sr1', name: '伝説の勇者', rarity: 'SR', description: '世界を救う運命にある若き勇者。', color: 'from-yellow-400 to-yellow-600', icon: '⚔️' },
   { id: 'sr2', name: '大魔神', rarity: 'SR', description: '大地をゆるがす巨大な魔神。', color: 'from-stone-600 to-stone-800', icon: '🗿' },
   { id: 'sr3', name: '黄金のドラゴン', rarity: 'SR', description: 'まばゆい光を放つ伝説のドラゴン。', color: 'from-yellow-500 to-orange-600', icon: '🐉' },
+  // Specially Super Rare (SSR)
+  { id: 'ssr1', name: '天の四神・青龍', rarity: 'SSR', description: '東方から天を舞う、恵みの雨をもたらす神聖な青き龍。', color: 'from-cyan-500 via-teal-500 to-emerald-600', icon: '🐉' },
+  { id: 'ssr2', name: '賢者の石', rarity: 'SSR', description: 'あらゆる物質を黄金に変え、不老不死をもたらすとされる伝説の結晶。', color: 'from-red-500 via-pink-600 to-purple-700', icon: '💎' },
   // Ultra Rare (UR)
   { id: 'ur1', name: '星くずの剣', rarity: 'UR', description: '宇宙の星くずから作られた最強の剣。', color: 'from-indigo-500 via-purple-500 to-pink-500', icon: '✨' },
   { id: 'ur2', name: '光の女神', rarity: 'UR', description: 'すべてを癒やす慈愛の女神。', color: 'from-yellow-200 via-yellow-400 to-yellow-500', icon: '👼' },
@@ -43,9 +46,10 @@ export const initialCards: Card[] = [
 
 export const DEFAULT_GACHA_RATES: Record<Rarity, number> = {
   SEC: 1,
-  UR: 5,
-  SR: 14,
-  R: 30,
+  UR: 4,
+  SSR: 8,
+  SR: 12,
+  R: 25,
   N: 50
 };
 
@@ -55,11 +59,12 @@ export const drawGacha = (
 ): Card => {
   const rSEC = rates.SEC ?? DEFAULT_GACHA_RATES.SEC;
   const rUR = rates.UR ?? DEFAULT_GACHA_RATES.UR;
+  const rSSR = rates.SSR ?? DEFAULT_GACHA_RATES.SSR;
   const rSR = rates.SR ?? DEFAULT_GACHA_RATES.SR;
   const rR = rates.R ?? DEFAULT_GACHA_RATES.R;
   const rN = rates.N ?? DEFAULT_GACHA_RATES.N;
 
-  const total = rSEC + rUR + rSR + rR + rN;
+  const total = rSEC + rUR + rSSR + rSR + rR + rN;
   const rand = Math.random() * total;
   
   let rarity: Rarity;
@@ -69,6 +74,8 @@ export const drawGacha = (
     rarity = 'SEC';
   } else if (rand < (current += rUR)) {
     rarity = 'UR';
+  } else if (rand < (current += rSSR)) {
+    rarity = 'SSR';
   } else if (rand < (current += rSR)) {
     rarity = 'SR';
   } else if (rand < (current += rR)) {
