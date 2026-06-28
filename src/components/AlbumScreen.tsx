@@ -3,6 +3,7 @@ import { UserProgress } from '../types';
 import { Card, Rarity } from '../cards';
 import { Undo2, Lock, Sparkles, Filter, X, RotateCw, Eye } from 'lucide-react';
 import CardBackPattern from './CardBackPattern';
+import Markdown from 'react-markdown';
 
 interface Props {
   progress: UserProgress;
@@ -11,6 +12,19 @@ interface Props {
 }
 
 const RARITY_ORDER: Rarity[] = ['N', 'R', 'SR', 'SSR', 'UR', 'SEC'];
+
+const modalMarkdownComponents = {
+  h1: ({ children }: any) => <span className="block font-black text-base text-slate-800 mt-2 mb-1">{children}</span>,
+  h2: ({ children }: any) => <span className="block font-black text-sm text-slate-800 mt-2 mb-1">{children}</span>,
+  h3: ({ children }: any) => <span className="block font-bold text-xs text-slate-700 mt-1.5 mb-0.5">{children}</span>,
+  p: ({ children }: any) => <span className="block mb-1.5 last:mb-0 leading-relaxed">{children}</span>,
+  ul: ({ children }: any) => <ul className="list-disc pl-5 mb-2 space-y-1 text-left">{children}</ul>,
+  ol: ({ children }: any) => <ol className="list-decimal pl-5 mb-2 space-y-1 text-left">{children}</ol>,
+  li: ({ children }: any) => <li className="leading-relaxed text-xs font-semibold text-slate-700">{children}</li>,
+  strong: ({ children }: any) => <strong className="font-black text-indigo-600">{children}</strong>,
+  em: ({ children }: any) => <em className="italic text-indigo-500 font-semibold">{children}</em>,
+  code: ({ children }: any) => <code className="px-1.5 py-0.5 rounded font-mono text-xs bg-slate-100 text-pink-600 border border-slate-200">{children}</code>,
+};
 
 const getRarityBadgeColor = (rarity: Rarity) => {
   switch (rarity) {
@@ -369,7 +383,9 @@ export default function AlbumScreen({ progress, onBack, cardsList }: Props) {
                     <div>
                       <span className="text-[10px] font-black text-slate-400 uppercase tracking-wider block mb-0.5">裏面の解説・ストーリー</span>
                       <div className="text-xs text-slate-700 leading-relaxed font-semibold bg-white p-3.5 rounded-xl border border-slate-200/60 shadow-inner max-h-[160px] overflow-y-auto">
-                        {selectedCard.backExplanation || selectedCard.description || '追加の説明解説はありません。'}
+                        <Markdown components={modalMarkdownComponents}>
+                          {(selectedCard.backExplanation || selectedCard.description || '追加の説明解説はありません。').replace(/\n/g, '  \n')}
+                        </Markdown>
                       </div>
                     </div>
 

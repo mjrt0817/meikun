@@ -1,10 +1,33 @@
 import React from 'react';
 import { Card } from '../cards';
 import { Sparkles, BookOpen, Cpu, Shield, HelpCircle } from 'lucide-react';
+import Markdown from 'react-markdown';
 
 interface Props {
   card: Card;
   className?: string;
+}
+
+function getMarkdownComponents(pattern: string) {
+  const isDark = ['cyber', 'fantasy', 'japanese'].includes(pattern);
+  let strongColor = 'text-indigo-600';
+  if (pattern === 'academic') strongColor = 'text-amber-900';
+  if (pattern === 'cyber') strongColor = 'text-cyan-300 drop-shadow-[0_0_2px_rgba(34,211,238,0.5)]';
+  if (pattern === 'fantasy') strongColor = 'text-amber-300';
+  if (pattern === 'japanese') strongColor = 'text-rose-300';
+
+  return {
+    h1: ({ children }: any) => <span className="block font-black text-xs md:text-sm mb-1">{children}</span>,
+    h2: ({ children }: any) => <span className="block font-black text-[10px] md:text-xs mb-1">{children}</span>,
+    h3: ({ children }: any) => <span className="block font-bold text-[10px] md:text-xs mb-0.5">{children}</span>,
+    p: ({ children }: any) => <span className="block mb-1.5 last:mb-0 leading-relaxed text-justify">{children}</span>,
+    ul: ({ children }: any) => <ul className="list-disc pl-4 mb-1.5 space-y-0.5 text-left">{children}</ul>,
+    ol: ({ children }: any) => <ol className="list-decimal pl-4 mb-1.5 space-y-0.5 text-left">{children}</ol>,
+    li: ({ children }: any) => <li className="leading-normal text-[10px] md:text-xs">{children}</li>,
+    strong: ({ children }: any) => <strong className={`font-black ${strongColor}`}>{children}</strong>,
+    em: ({ children }: any) => <em className="italic opacity-90">{children}</em>,
+    code: ({ children }: any) => <code className={`px-1 py-0.5 rounded font-mono text-[9px] md:text-[10px] ${isDark ? 'bg-white/10 text-pink-300' : 'bg-black/5 text-indigo-600'}`}>{children}</code>,
+  };
 }
 
 export default function CardBackPattern({ card, className = '' }: Props) {
@@ -12,6 +35,7 @@ export default function CardBackPattern({ card, className = '' }: Props) {
   const title = card.backTitle || card.name;
   const explanation = card.backExplanation || card.description;
   const subtitle = card.backSubtitle || `${card.rarity} Rank Card`;
+  const formattedExplanation = explanation.replace(/\n/g, '  \n');
 
   // Render different themed card backs based on selected pattern
   switch (pattern) {
@@ -36,10 +60,12 @@ export default function CardBackPattern({ card, className = '' }: Props) {
             )}
           </div>
 
-          <div className="flex-1 flex items-center justify-center my-4 overflow-y-auto px-1">
-            <p className="font-serif text-xs leading-relaxed text-[#4a3525] text-justify font-medium">
-              {explanation}
-            </p>
+          <div className="flex-1 flex items-center justify-center my-4 overflow-y-auto px-1 font-serif text-xs leading-relaxed text-[#4a3525] w-full">
+            <div className="w-full text-left">
+              <Markdown components={getMarkdownComponents(pattern)}>
+                {formattedExplanation}
+              </Markdown>
+            </div>
           </div>
 
           <div className="flex items-center justify-between border-t border-[#8c6d53]/20 pt-2 text-[#8c6d53] text-[9px] font-bold">
@@ -76,10 +102,12 @@ export default function CardBackPattern({ card, className = '' }: Props) {
             )}
           </div>
 
-          <div className="flex-1 flex items-center my-3 bg-slate-900/60 p-3 rounded-lg border border-cyan-500/10 overflow-y-auto">
-            <p className="font-mono text-[11px] leading-relaxed text-cyan-100 text-left">
-              {explanation}
-            </p>
+          <div className="flex-1 flex items-center my-3 bg-slate-900/60 p-3 rounded-lg border border-cyan-500/10 overflow-y-auto font-mono text-[10px] md:text-[11px] leading-relaxed text-cyan-100 text-left w-full">
+            <div className="w-full">
+              <Markdown components={getMarkdownComponents(pattern)}>
+                {formattedExplanation}
+              </Markdown>
+            </div>
           </div>
 
           <div className="flex items-center justify-between font-mono text-[9px] text-cyan-500/70">
@@ -112,10 +140,12 @@ export default function CardBackPattern({ card, className = '' }: Props) {
             )}
           </div>
 
-          <div className="flex-1 flex items-center justify-center my-4 overflow-y-auto px-1">
-            <p className="font-sans text-xs leading-relaxed text-slate-100 text-center font-medium drop-shadow-sm">
-              {explanation}
-            </p>
+          <div className="flex-1 flex items-center justify-center my-4 overflow-y-auto px-1 font-sans text-xs leading-relaxed text-slate-100 text-center font-medium drop-shadow-sm w-full">
+            <div className="w-full">
+              <Markdown components={getMarkdownComponents(pattern)}>
+                {formattedExplanation}
+              </Markdown>
+            </div>
           </div>
 
           <div className="flex items-center justify-between text-amber-400/60 text-[9px] font-bold">
@@ -147,10 +177,12 @@ export default function CardBackPattern({ card, className = '' }: Props) {
             )}
           </div>
 
-          <div className="flex-1 flex items-center justify-center my-4 overflow-y-auto px-1">
-            <p className="font-sans text-xs leading-relaxed text-pink-50 text-justify font-medium tracking-wide">
-              {explanation}
-            </p>
+          <div className="flex-1 flex items-center justify-center my-4 overflow-y-auto px-1 font-sans text-xs leading-relaxed text-pink-50 text-center font-medium tracking-wide w-full">
+            <div className="w-full">
+              <Markdown components={getMarkdownComponents(pattern)}>
+                {formattedExplanation}
+              </Markdown>
+            </div>
           </div>
 
           <div className="flex items-center justify-between text-purple-400 text-[9px] font-bold">
@@ -180,10 +212,12 @@ export default function CardBackPattern({ card, className = '' }: Props) {
             )}
           </div>
 
-          <div className="flex-1 flex items-center my-4 overflow-y-auto">
-            <p className="text-xs leading-relaxed text-gray-700 font-semibold">
-              {explanation}
-            </p>
+          <div className="flex-1 flex items-center my-4 overflow-y-auto text-xs leading-relaxed text-gray-700 font-semibold text-left w-full">
+            <div className="w-full">
+              <Markdown components={getMarkdownComponents(pattern)}>
+                {formattedExplanation}
+              </Markdown>
+            </div>
           </div>
 
           <div className="flex items-center justify-between border-t border-gray-200 pt-2.5 text-gray-400 text-[9px] font-black">
