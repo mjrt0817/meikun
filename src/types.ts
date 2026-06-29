@@ -28,6 +28,7 @@ export interface UserProgress {
   gachaRates?: Record<string, number>;
   customQuestions?: Question[];
   reviewSchedules?: Record<string, ReviewSchedule>;
+  showReportToChild?: boolean; // 子ども本人のホーム画面にレポートを表示するかどうか
 }
 
-export type ViewState = 'home' | 'practice' | 'review' | 'mock-exam' | 'mock-exam-result' | 'gacha' | 'album';
+export type ViewState = 'home' | 'practice' | 'review' | 'mock-exam' | 'mock-exam-result' | 'gacha' | 'album' | 'parent-report';

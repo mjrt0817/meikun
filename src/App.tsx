@@ -10,9 +10,10 @@ import LoginScreen from './components/LoginScreen';
 import GachaScreen from './components/GachaScreen';
 import AlbumScreen from './components/AlbumScreen';
 import CardBackPattern from './components/CardBackPattern';
+import ParentReportScreen from './components/ParentReportScreen';
 import { compressImage } from './utils/imageCompressor';
 import { DEFAULT_GACHA_RATES, Rarity, Card, initialCards } from './cards';
-import { BookOpen, Calculator, PlayCircle, RefreshCw, Award, Home, Brain, Target, ChevronRight, LogOut, Loader2, Sparkles, Image, Coins, Plus, Trash2, Edit } from 'lucide-react';
+import { BookOpen, Calculator, PlayCircle, RefreshCw, Award, Home, Brain, Target, ChevronRight, LogOut, Loader2, Sparkles, Image, Coins, Plus, Trash2, Edit, BarChart3 } from 'lucide-react';
 import { auth, subscribeToAuth, loadProgress as loadFirebaseProgress, saveProgress as saveFirebaseProgress, logout, loadCards, saveCard, removeCard } from './lib/firebase';
 import CsvQuestionManager from './components/CsvQuestionManager';
 import { getActiveReviewQuestions, getRetentionStats } from './utils/ebbinghaus';
@@ -365,7 +366,7 @@ export default function App() {
               </button>
               <button
                 onClick={() => setViewState('album')}
-                className="w-full flex items-center justify-between bg-white border-2 border-yellow-100 hover:border-yellow-200 text-gray-700 p-4 rounded-xl font-bold transition-all active:scale-[0.98]"
+                className="w-full flex items-center justify-between bg-white border-2 border-yellow-100 hover:border-yellow-200 text-gray-700 p-4 rounded-xl font-bold transition-all active:scale-[0.98] cursor-pointer"
               >
                 <div className="flex items-center">
                   <Image className="w-6 h-6 mr-3 text-yellow-400" />
@@ -373,6 +374,18 @@ export default function App() {
                 </div>
                 <ChevronRight className="w-5 h-5 text-gray-300" />
               </button>
+              {progress.showReportToChild && (
+                <button
+                  onClick={() => setViewState('parent-report')}
+                  className="w-full flex items-center justify-between bg-gradient-to-r from-indigo-500 to-purple-600 text-white p-4 rounded-xl font-extrabold shadow-md transition-all active:scale-[0.98] cursor-pointer animate-in fade-in"
+                >
+                  <div className="flex items-center">
+                    <BarChart3 className="w-6 h-6 mr-3 text-indigo-100" />
+                    学習分析・強み弱み診断
+                  </div>
+                  <ChevronRight className="w-5 h-5 text-indigo-200" />
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -503,6 +516,16 @@ export default function App() {
                 </button>
               </div>
               <div className="flex flex-wrap gap-4 mb-6">
+                <button
+                  onClick={() => {
+                    setShowSettings(false);
+                    setViewState('parent-report');
+                  }}
+                  className="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold py-3 px-5 rounded-xl shadow-md transition-all text-sm flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  <BarChart3 className="w-4 h-4" />
+                  学習分析レポートを開く（保護者用診断）
+                </button>
                 <button
                   onClick={() => {
                     handleUpdateProgress({
@@ -1067,6 +1090,17 @@ export default function App() {
               progress={progress}
               onBack={() => setViewState('home')}
               cardsList={cardsList}
+            />
+          </div>
+        )}
+
+        {viewState === 'parent-report' && (
+          <div className="animate-in slide-in-from-right duration-300">
+            <ParentReportScreen
+              progress={progress}
+              questions={allQuestions}
+              onBack={() => setViewState('home')}
+              onUpdateProgress={handleUpdateProgress}
             />
           </div>
         )}
